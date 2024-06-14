@@ -3,6 +3,7 @@ import yaml
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from linkml.generators.pydanticgen import PydanticGenerator
+from fastapi.responses import FileResponse
 from linkml_runtime.linkml_model.meta import SchemaDefinition
 
 
@@ -33,4 +34,8 @@ async def gen_pydantic(request: Request):
         raise HTTPException(status_code=422, detail="Invalid YAML")
     generator = PydanticGenerator(schema=SchemaDefinition(**data))
     pydantic_model = generator.serialize()
-    return pydantic_model
+    
+    with open('pydantic_model.py', 'w') as f:
+        f.write(pydantic_model)
+
+    return FileResponse('pydantic_model.py', media_type='application/octet-stream', filename='pydantic_model.py')
