@@ -1,12 +1,20 @@
 import yaml
 
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from linkml.generators.pydanticgen import PydanticGenerator
 from linkml_runtime.linkml_model.meta import SchemaDefinition
 
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.post(
     "/gen-pydantic/",
