@@ -1,0 +1,7 @@
+services:
+ gen-pydantic:
+   build:
+     context: .
+   image: gen-pydantic:v1
+   ports:
+     - "8001:8000" 
