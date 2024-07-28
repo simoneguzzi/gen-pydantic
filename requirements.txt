@@ -1,2 +1,3 @@
 fastapi
 linkml
+uvicorn[standard]
