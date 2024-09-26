@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 @app.post(
-    "/gen-pydantic/",
+    "/api/gen-pydantic/",
     openapi_extra={
         "requestBody": {
             "content": {"application/x-yaml"},
@@ -49,7 +49,7 @@ async def gen_pydantic(request: Request):
     return FileResponse('pydantic_model.py', media_type='application/octet-stream', filename='pydantic_model.py')
 
 @app.post(
-    "/validate-linkml/",
+    "/api/validate-linkml/",
     openapi_extra={
         "requestBody": {
             "content": {"application/x-yaml"},
