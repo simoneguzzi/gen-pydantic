@@ -1,3 +1,4 @@
 fastapi
 linkml
+openai
 uvicorn[standard]

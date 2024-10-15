@@ -5,9 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from linkml.generators.pydanticgen import PydanticGenerator
 from linkml.linter.linter import Linter
 from linkml.linter.formatters import JsonFormatter
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from linkml_runtime.linkml_model.meta import SchemaDefinition
+from openai import OpenAI
+import os
 
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_THREAD_ID = os.getenv("OPENAI_THREAD_ID")
+OPENAI_ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
 
 app = FastAPI()
 
@@ -85,3 +90,25 @@ async def validate_linkml(request: Request):
         return FileResponse(
             "report.json", media_type="application/json", filename="report.json"
         )
+
+
+@app.post("/api/openai/generate")
+async def generate(request: Request):
+    if not (OPENAI_API_KEY and OPENAI_THREAD_ID and OPENAI_ASSISTANT_ID):
+        return Response(
+            status_code=500,
+            content="OpenAI API key, thread ID, or assistant ID not set",
+        )
+
+    raw_body = await request.body()
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    client.beta.threads.messages.create(
+        thread_id=OPENAI_THREAD_ID, role="user", content=raw_body.decode("utf-8")
+    )
+    run = client.beta.threads.runs.create_and_poll(
+        thread_id=OPENAI_THREAD_ID, assistant_id=OPENAI_ASSISTANT_ID
+    )
+    if run.status == "completed":
+        messages = client.beta.threads.messages.list(thread_id=run.thread_id)
+
+    return Response(content=messages.data[0].content[0].text.value)
