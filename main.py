@@ -92,7 +92,7 @@ async def validate_linkml(request: Request):
         )
 
 
-@app.post("/api/openai/generate")
+@app.post("/api/openai/generate/")
 async def generate(request: Request):
     if not (OPENAI_API_KEY and OPENAI_THREAD_ID and OPENAI_ASSISTANT_ID):
         return Response(
